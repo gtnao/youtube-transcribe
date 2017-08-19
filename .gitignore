@@ -1,5 +1,5 @@
 node_modules/
-styles/
-!styles/normalize.css
+styles/*
+!normalize.css
 package-lock.json
 .idea/
