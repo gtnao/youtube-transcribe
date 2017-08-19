@@ -1,0 +1,26 @@
+{
+  "name": "youtube-transcribe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "gulp": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gtnao0219/youtube-transcribe.git"
+  },
+  "author": "naotaka-nakane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gtnao0219/youtube-transcribe/issues"
+  },
+  "homepage": "https://github.com/gtnao0219/youtube-transcribe#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^3.1.0"
+  }
+}

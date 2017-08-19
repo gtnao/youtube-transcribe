@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="./styles/normalize.css">
+  <link rel="stylesheet" href="./styles/popup.css">
+</head>
+<body class="main-flex">
+
+<div class="header">
+  <span class="title">YouTube Transcribe</span>
+  <div class="on-off-switch">
+    <div class="switch-flex">
+      <input id="on-off-input" type="checkbox">
+      <div id="on-off-slider" class="slider"></div>
+      <div class="switch-label switch-pre-label"><span class="switch-text">Off</span></div>
+      <div class="switch-label switch-post-label"><span class="switch-text">On</span></div>
+    </div>
+  </div>
+</div>
+<div class="seek-bar-area">
+<input type="range" class="seek-bar-range">
+</div>
+<div class="divider"></div>
+<div class="controller-flex">
+  <div class="btn-flex">
+    <div class="back-btn-flex">
+      <div id="replay-five-btn" class="btn back-btn">
+        <object data="./svg/replay_5.svg" type="image/svg+xml">
+        </object>
+      </div>
+      <div id="replay-ten-btn" class="btn back-btn">
+        <object data="./svg/replay_10.svg" type="image/svg+xml">
+        </object>
+      </div>
+      <div id="replay-fifteen-btn" class="btn back-btn">
+        <object data="./svg/replay_30.svg" type="image/svg+xml">
+        </object>
+      </div>
+    </div>
+    <div id="play-btn" class="btn play-btn">
+      <object data="./svg/play.svg" type="image/svg+xml" id="play-btn-svg" style="display: none;">
+      </object>
+      <object data="./svg/pause.svg" type="image/svg+xml" id="pause-btn-svg" style="display: inline;">
+      </object>
+    </div>
+  </div>
+  <div class="range-flex">
+    <div class="range-wrapper">
+      <div class="range-label">
+        <label>Volume: </label>
+        <span id="volumen-num">50</span>
+      </div>
+      <div class="range-main">
+        <input id="volume-range" type="range" class="control-range" min="0" max="100" value="50">
+      </div>
+    </div>
+    <div class="range-wrapper">
+      <div class="range-label">
+        <label>Speed: </label>
+        <span id="speed-num">x1.0</span>
+      </div>
+      <div class="range-main">
+        <input id="speed-range" type="range" class="control-range" min="50" max="150" value="100">
+      </div>
+    </div>
+    <div class="range-wrapper">
+      <div class="range-label">
+        <label>Pitch: </label>
+        <span id="pitch-num">0</span>
+      </div>
+      <div class="range-main">
+        <input id="pitch-range" type="range" class="control-range" min="-12" max="12" value="0">
+      </div>
+    </div>
+  </div>
+</div>
+<script src="./lib/jquery-3.2.1.min.js"></script>
+<script src="./scripts/popup.js"></script>
+</body>
+</html>
