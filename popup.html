@@ -2,80 +2,197 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="./styles/normalize.css">
-  <link rel="stylesheet" href="./styles/popup.css">
+  <link href="./styles/normalize.css" rel="stylesheet">
+  <link href="./lib/nouislider.min.css" rel="stylesheet">
+  <link href="./styles/popup.css" rel="stylesheet">
 </head>
-<body class="main-flex">
-
-<div class="header">
-  <span class="title">YouTube Transcribe</span>
-  <div class="on-off-switch">
-    <div class="switch-flex">
-      <input id="on-off-input" type="checkbox">
-      <div id="on-off-slider" class="slider"></div>
-      <div class="switch-label switch-pre-label"><span class="switch-text">Off</span></div>
-      <div class="switch-label switch-post-label"><span class="switch-text">On</span></div>
+<body>
+<div class="main-flex">
+  <div class="header">
+    <span class="title">YouTube Transcribe</span>
+    <div class="on-off-switch">
+      <div class="switch-flex">
+        <input id="on-off-input" type="checkbox">
+        <div id="on-off-slider" class="switch-slider"></div>
+        <div class="switch-label switch-pre-label"><span class="switch-text">Off</span></div>
+        <div class="switch-label switch-post-label"><span class="switch-text">On</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="seek-bar-area">
+    <div class="duration-text">
+      <span id="current-time">3:40</span> / <span id="duration">6:00</span>
+    </div>
+    <input type="range" min="0" max="600" value="0" id="seek-var-range" class="seek-bar-range">
+    <div class="loop-slider-area">
+      <div id="slider"></div>
+    </div>
+    <div class="loop-control-area">
+      <div class="loop-text">
+        <span class="loop-title">LoopStart:</span> <span id="loop-start--num">3:00</span> ~ <span class="loop-title">LoopEnd:</span> <span id="loop-end-num">5:00</span>
+      </div>
+      <div class="loop-on-off">
+        <div class="repeat-icn">
+          <object data="./svg/repeat.svg" type="image/svg+xml">
+          </object>
+        </div>
+        <div class="switch-flex">
+          <input id="loop-switch" type="checkbox">
+          <div id="loop-slider" class="switch-slider"></div>
+          <div class="switch-label switch-pre-label"><span class="switch-text">Off</span></div>
+          <div class="switch-label switch-post-label"><span class="switch-text">On</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="controller-flex">
+    <div class="btn-flex">
+      <div class="back-btn-flex">
+        <div id="replay-five-btn" class="btn back-btn">
+          <object data="./svg/replay_5.svg" type="image/svg+xml">
+          </object>
+        </div>
+        <div id="replay-ten-btn" class="btn back-btn">
+          <object data="./svg/replay_10.svg" type="image/svg+xml">
+          </object>
+        </div>
+        <div id="replay-fifteen-btn" class="btn back-btn">
+          <object data="./svg/replay_30.svg" type="image/svg+xml">
+          </object>
+        </div>
+      </div>
+      <div id="play-btn" class="btn play-btn">
+        <object data="./svg/play.svg" type="image/svg+xml" id="play-btn-svg">
+        </object>
+        <object data="./svg/pause.svg" type="image/svg+xml" id="pause-btn-svg">
+        </object>
+      </div>
+    </div>
+    <div class="range-flex">
+      <div class="range-wrapper">
+        <div class="range-head-flex">
+          <div class="range-label">
+            <label>Volume: </label>
+            <span id="volume-num">50</span>
+          </div>
+          <div id="volume-reset-btn" class="btn reset-btn">RESET</div>
+        </div>
+        <div class="range-main">
+          <input id="volume-range" type="range" class="control-range" min="0" max="100" value="50">
+        </div>
+      </div>
+      <div class="range-wrapper">
+        <div class="range-head-flex">
+          <div class="range-label">
+            <label>Speed: </label>
+            <span id="speed-num">x1.0</span>
+          </div>
+          <div id="speed-reset-btn" class="btn reset-btn">RESET</div>
+        </div>
+        <div class="range-main">
+          <input id="speed-range" type="range" class="control-range" min="50" max="150" value="100">
+        </div>
+      </div>
+      <div class="range-wrapper">
+        <div class="range-head-flex">
+          <div class="range-label">
+            <label>Pitch: </label>
+            <span id="pitch-num">0</span>
+          </div>
+          <div id="pitch-reset-btn" class="btn reset-btn">RESET</div>
+        </div>
+        <div class="range-main">
+          <input id="pitch-range" type="range" class="control-range" min="-12" max="12" value="0">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="eq-header">
+    <div class="eq-title">Equalizer</div>
+    <div id="eq-reset-btn" class="btn reset-btn">RESET</div>
+  </div>
+  <div class="eq-box">
+    <div class="each-eq">
+      <input id="eq1" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq2" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq3" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq4" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq5" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq6" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq7" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq8" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq9" type="range" class="control-range" min="-16" max="16" value="0">
+    </div>
+    <div class="each-eq">
+      <input id="eq10" type="range" class="control-range" min="-16" max="16" value="0">
     </div>
   </div>
 </div>
-<div class="seek-bar-area">
-<input type="range" class="seek-bar-range">
+<div class="eq-value-area">
+  <div class="eq-value">
+    <div>32Hz</div>
+    <div id="eq1-value">-16db</div>
+  </div>
+  <div class="eq-value">
+    <div>64Hz</div>
+    <div id="eq2-value">0db</div>
+  </div>
+  <div class="eq-value">
+    <div>125Hz</div>
+    <div id="eq3-value">16db</div>
+  </div>
+  <div class="eq-value">
+    <div>250Hz</div>
+    <div id="eq4-value">8db</div>
+  </div>
+  <div class="eq-value">
+    <div>500Hz</div>
+    <div id="eq5-value">2db</div>
+  </div>
+  <div class="eq-value">
+    <div>1kHz</div>
+    <div id="eq6-value">-1db</div>
+  </div>
+  <div class="eq-value">
+    <div>2kHz</div>
+    <div id="eq7-value">-10db</div>
+  </div>
+  <div class="eq-value">
+    <div>4kHz</div>
+    <div id="eq8-value">3db</div>
+  </div>
+  <div class="eq-value">
+    <div>8kHz</div>
+    <div id="eq9-value">-10db</div>
+  </div>
+  <div class="eq-value">
+    <div>16kHz</div>
+    <div id="eq10-value">16db</div>
+  </div>
 </div>
-<div class="divider"></div>
-<div class="controller-flex">
-  <div class="btn-flex">
-    <div class="back-btn-flex">
-      <div id="replay-five-btn" class="btn back-btn">
-        <object data="./svg/replay_5.svg" type="image/svg+xml">
-        </object>
-      </div>
-      <div id="replay-ten-btn" class="btn back-btn">
-        <object data="./svg/replay_10.svg" type="image/svg+xml">
-        </object>
-      </div>
-      <div id="replay-fifteen-btn" class="btn back-btn">
-        <object data="./svg/replay_30.svg" type="image/svg+xml">
-        </object>
-      </div>
-    </div>
-    <div id="play-btn" class="btn play-btn">
-      <object data="./svg/play.svg" type="image/svg+xml" id="play-btn-svg" style="display: none;">
-      </object>
-      <object data="./svg/pause.svg" type="image/svg+xml" id="pause-btn-svg" style="display: inline;">
-      </object>
-    </div>
-  </div>
-  <div class="range-flex">
-    <div class="range-wrapper">
-      <div class="range-label">
-        <label>Volume: </label>
-        <span id="volumen-num">50</span>
-      </div>
-      <div class="range-main">
-        <input id="volume-range" type="range" class="control-range" min="0" max="100" value="50">
-      </div>
-    </div>
-    <div class="range-wrapper">
-      <div class="range-label">
-        <label>Speed: </label>
-        <span id="speed-num">x1.0</span>
-      </div>
-      <div class="range-main">
-        <input id="speed-range" type="range" class="control-range" min="50" max="150" value="100">
-      </div>
-    </div>
-    <div class="range-wrapper">
-      <div class="range-label">
-        <label>Pitch: </label>
-        <span id="pitch-num">0</span>
-      </div>
-      <div class="range-main">
-        <input id="pitch-range" type="range" class="control-range" min="-12" max="12" value="0">
-      </div>
-    </div>
-  </div>
+<div class="footer">
+  <span class="copy-right">Copyright © 2017 Naotaka Nakane All Rights Reserved.</span>
 </div>
 <script src="./lib/jquery-3.2.1.min.js"></script>
+<script src="./lib/nouislider.min.js"></script>
 <script src="./scripts/popup.js"></script>
 </body>
 </html>
