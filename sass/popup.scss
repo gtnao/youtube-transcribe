@@ -76,7 +76,7 @@ no ui slider customize
   border: 1px solid $divider-color;
   border-radius: 0;
   box-shadow: none;
-  cursor: pointer;
+  cursor: default;
 }
 .noUi-horizontal {
   height: 10px;
@@ -141,18 +141,18 @@ header area
 }
 .title {
   color: $primary-color-dark;
-  font-size: 2.4rem;
+  font-size: 3.6rem;
   line-height: $header-height;
   font-weight: bold;
   vertical-align: text-top;
 }
-.on-off-switch {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  padding: ($header-height - ($switch-width / 2)) / 2;
-}
+//.on-off-switch {
+//  position: absolute;
+//  top: 0;
+//  bottom: 0;
+//  right: 0;
+//  padding: ($header-height - ($switch-width / 2)) / 2;
+//}
 
 /**
 switch

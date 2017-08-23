@@ -2,7 +2,7 @@
   "name": "youtube-transcribe",
   "version": "1.0.0",
   "manifest_version": 2,
-  "description": "enable pitch-shift, time-stretch and loop-play on YouTube",
+  "description": "enable pitch-shift, time-stretch, equalizing and loop-play on YouTube",
   "icons": {
     "16": "icon/icon-16.png",
     "128": "icon/icon-128.png"
@@ -15,6 +15,7 @@
   },
   "permissions": [
     "tabs",
+    "webNavigation",
     "https://www.youtube.com/*"
   ],
   "browser_action": {
