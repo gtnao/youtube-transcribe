@@ -1,7 +1,7 @@
 {
-  "name": "youtube-transcribe",
+  "name": "tube-mania",
   "version": "1.0.0",
-  "description": "",
+  "description": "enable pitch-shift, time-stretch, equalizing and loop-play on YouTube",
   "main": "index.js",
   "scripts": {
     "gulp": "gulp",

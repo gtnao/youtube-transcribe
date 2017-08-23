@@ -1,5 +1,5 @@
 {
-  "name": "youtube-transcribe",
+  "name": "tube-mania",
   "version": "1.0.0",
   "manifest_version": 2,
   "description": "enable pitch-shift, time-stretch, equalizing and loop-play on YouTube",
@@ -20,7 +20,7 @@
   ],
   "browser_action": {
     "default_icon": "icon/icon-16.png",
-    "default_title": "youtube-transcribe",
+    "default_title": "tube-mania",
     "default_popup": "popup.html"
   },
   "content_scripts": [
