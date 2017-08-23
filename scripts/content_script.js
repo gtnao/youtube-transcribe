@@ -1,8 +1,6 @@
 'use strict';
 
 (function() {
-  console.log('contents script is loading'); // debug
-
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
   // constructor
@@ -21,7 +19,7 @@
     // parameter
     this.loop = false;
     this.loopStart = 0;
-    this.loopEnd = 0;
+    this.loopEnd = 1;
     this.pitch = 0;
     // other
     this.alreadyLoaded = false;
@@ -89,6 +87,7 @@
       });
     }
   };
+
   // create instance
   new Content();
 })();
@@ -130,29 +129,17 @@ function eqSet(that) {
 
 function loadVideo(that) {
   var video = document.getElementsByTagName('video')[0];
-  if (video === undefined) {
-    console.log('not found video');
-  } else {
-    console.log(video);
+  if (video !== undefined && video.src !== '') {
     that.alreadyLoaded = true;
     that.source = that.audioCtx.createMediaElementSource(video);
     that.videoEl = that.source.mediaElement;
     that.source.connect(that.input);
-    console.log(that.source);
     video.addEventListener('loadeddata', function() {
-      console.log('loadeddata');
       that.loopEnd = video.duration;
-      // 動画が変化したときなどのイベント
     });
-    // video.addEventListener('timeupdate', function() {
-    //   // update current time
-    //   chrome.runtime.sendMessage({type: 'every_seconds', currentTime: that.source.mediaElement.currentTime, duration: that.source.mediaElement.duration}, function(response) {
-    //   });
-    //   // Loop setting
-    //   if (that.loop && that.loopEnd <= that.source.mediaElement.currentTime) {
-    //     that.source.mediaElement.currentTime = that.loopStart;
-    //   }
-    // });
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -160,8 +147,15 @@ function assignEvent(that) {
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     switch (message.type) {
       case 'init': {
+        if (!that.alreadyLoaded) {
+          if (!loadVideo(that)) {
+            return true;
+          }
+        }
+        if (that.videoEl.src === '') {
+          return true;
+        }
         sendResponse({
-          isValid: true,
           currentTime: that.videoEl.currentTime,
           duration: that.videoEl.duration,
           loop: that.loop,
@@ -177,11 +171,16 @@ function assignEvent(that) {
         });
         that.videoEl.addEventListener('timeupdate', function() {
           // update current time
-          chrome.runtime.sendMessage({type: 'every_seconds', tabId: message.tabId, currentTime: that.source.mediaElement.currentTime, duration: that.source.mediaElement.duration}, function(response) {
+          chrome.runtime.sendMessage({
+            type: 'timeupdate',
+            tabId: message.tabId,
+            currentTime: that.videoEl.currentTime,
+            duration: that.videoEl.duration},
+            function(response) {
           });
           // Loop setting
-          if (that.loop && that.loopEnd <= that.source.mediaElement.currentTime) {
-            that.source.mediaElement.currentTime = that.loopStart;
+          if (that.loop && that.loopEnd <= that.videoEl.currentTime) {
+            that.videoEl.currentTime = that.loopStart;
             if (that.videoEl.paused) {
               that.videoEl.play();
             }
