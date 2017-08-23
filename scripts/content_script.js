@@ -23,6 +23,7 @@
     this.pitch = 0;
     // other
     this.alreadyLoaded = false;
+    this.hasVideo = false;
 
     connectNode(this);
 
@@ -131,6 +132,7 @@ function loadVideo(that) {
   var video = document.getElementsByTagName('video')[0];
   if (video !== undefined && video.src !== '') {
     that.alreadyLoaded = true;
+    that.hasVideo = true;
     that.source = that.audioCtx.createMediaElementSource(video);
     that.videoEl = that.source.mediaElement;
     that.source.connect(that.input);
@@ -153,7 +155,10 @@ function assignEvent(that) {
           }
         }
         if (that.videoEl.src === '') {
+          that.hasVideo = false;
           return true;
+        } else {
+          that.hasVideo = true;
         }
         sendResponse({
           currentTime: that.videoEl.currentTime,
@@ -197,50 +202,62 @@ function assignEvent(that) {
         break;
       }
       case 'play': {
+        if (!that.hasVideo) {break;}
         that.play();
         break;
       }
       case 'pause': {
+        if (!that.hasVideo) {break;}
         that.pause();
         break;
       }
       case 'back': {
+        if (!that.hasVideo) {break;}
         that.back(message.seconds);
         break;
       }
       case 'changeTime': {
+        if (!that.hasVideo) {break;}
         that.changeTime(message.seconds);
         break;
       }
       case 'changeVolume': {
+        if (!that.hasVideo) {break;}
         that.changeVolume(message.volume);
         break;
       }
       case 'changeSpeed': {
+        if (!that.hasVideo) {break;}
         that.changeSpeed(message.speed);
         break;
       }
       case 'changePitch': {
+        if (!that.hasVideo) {break;}
         that.changePitch(message.pitch);
         break;
       }
       case 'enableLoop': {
+        if (!that.hasVideo) {break;}
         that.enableLoop(message.isEnabled);
         break;
       }
       case 'setLoopStart': {
+        if (!that.hasVideo) {break;}
         that.setLoopStart(message.seconds);
         break;
       }
       case 'setLoopEnd': {
+        if (!that.hasVideo) {break;}
         that.setLoopEnd(message.seconds);
         break;
       }
       case 'changeEq': {
+        if (!that.hasVideo) {break;}
         that.changeEq(message.zoneIdx, message.gain);
         break;
       }
       case 'resetEq': {
+        if (!that.hasVideo) {break;}
         that.resetEq();
         break;
       }
