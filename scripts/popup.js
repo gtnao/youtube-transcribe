@@ -4,10 +4,7 @@
   // constructor
   var Popup = function() {
     // fields
-    // flg
     this.seeking = false;
-    this.isValid = false;
-    // props
     this.currentTime = 0;
     this.duration = 1;
     this.loop = false;
@@ -39,10 +36,7 @@
   // send initialization message to content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {type: 'init', tabId: tabs[0].id}, function(response) {
-      if (response === undefined) {
-        popup.isValid = false;
-      } else {
-        popup.isValid = true;
+      if (response !== undefined) {
         initPrams(popup, response);
       }
     });
@@ -51,18 +45,23 @@
   // Event Listeners
   $('#loop-slider').on('click', function() {
     if(popup.loop) {
-      $('#loop-switch').attr('checked', false);
       popup.loop  = false;
+      $('#loop-switch').attr('checked', false);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'enableLoop', isEnabled: false});
       });
     } else {
-      $('#loop-switch').attr('checked', true);
       popup.loop  = true;
+      $('#loop-switch').attr('checked', true);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'enableLoop', isEnabled: true});
       });
     }
+  });
+  $('#seek-bar-range').on('input', function() {
+    var val = Number($(this).val());
+    popup.seeking = true;
+    $('#current-time').text(convertSeconds(val));
   });
   $('#seek-bar-range').on('change', function() {
     var val = Number($(this).val());
@@ -70,11 +69,6 @@
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {type: 'changeTime', seconds: val});
     });
-  });
-  $('#seek-bar-range').on('input', function() {
-    var val = Number($(this).val());
-    popup.seeking = true;
-    $('#current-time').text(convertSeconds(val));
   });
   $('#play-btn').on('click', function () {
     if (popup.isPaused) {
@@ -228,6 +222,13 @@
       chrome.tabs.sendMessage(tabs[0].id, {type: 'resetEq'});
     });
   });
+  popup.slider.noUiSlider.on('update', function(values, handle) {
+    if (handle === 0) {
+      $("#loop-start-num").text(convertSeconds(values[0]));
+    } else if (handle === 1) {
+      $("#loop-end-num").text(convertSeconds(values[1]));
+    }
+  });
   popup.slider.noUiSlider.on('end', function(values, handle){
     if (handle === 0) {
       popup.loopStart = Number(values[0]);
@@ -239,13 +240,6 @@
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopEnd', seconds: Number(values[1])});
       });
-    }
-  });
-  popup.slider.noUiSlider.on('update', function(values, handle) {
-    if (handle === 0) {
-      $("#loop-start-num").text(convertSeconds(values[0]));
-    } else if (handle === 1) {
-      $("#loop-end-num").text(convertSeconds(values[1]));
     }
   });
 
