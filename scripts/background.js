@@ -1,16 +1,16 @@
 'use strict';
+
 (function () {
-  var Background = function() {
-    var self = this;
-    this.volume = 50;
-    chrome.runtime.onMessage.addListener(
-      function(request, sender, sendResponse) {
-        switch (request.type) {
-          case 'updateTime': {
-            break;
-          }
+
+  chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
+    chrome.tabs.get(details.tabId, function(tab) {
+      if (details.url === tab.url) {
+        var regExp = /https:\/\/www.youtube.com\/watch/;
+        if (regExp.test(tab.url)) {
+          chrome.tabs.sendMessage(tab.id, {type: 'reloadVideo'});
         }
-      });
-  };
-  window.bg = new Background();
+      }
+    })
+  });
+
 })();
