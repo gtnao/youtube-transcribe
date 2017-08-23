@@ -42,50 +42,47 @@
   // send initialization message to content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {type: 'init', tabId: tabs[0].id}, function(response) {
-      console.log(response);
-      if (response.isValid) {
-        popup.currentTime = response.currentTime;
-        $('#seek-bar-range').val(response.currentTime);
-        $('#current-time').text(convertSeconds(response.currentTime));
-        popup.duration = response.duration;
-        $('#seek-bar-range').attr('max', response.duration);
-        $('#duration').text(convertSeconds(response.duration));
-        popup.slider.noUiSlider.updateOptions({
-          range: {
-            'min': 0,
-            'max': response.duration
-          }
-        });
-        popup.loop = response.loop;
-        $('#loop-switch').attr('checked', response.loop);
-        popup.loopStart = response.loopStart;
-        $("#loop-start-num").text(convertSeconds(response.loopStart));
-        popup.loopEnd = response.loopEnd;
-        $("#loop-end-num").text(convertSeconds(response.loopEnd));
-        popup.slider.noUiSlider.set([response.loopStart, response.loopEnd]);
-        popup.isPaused = response.isPaused;
-        if (response.isPaused) {
-          $('#play-btn-svg').css('display', 'inline');
-          $('#pause-btn-svg').css('display', 'none');
-        } else {
-          $('#play-btn-svg').css('display', 'none');
-          $('#pause-btn-svg').css('display', 'inline');
+      popup.currentTime = response.currentTime;
+      $('#seek-bar-range').val(response.currentTime);
+      $('#current-time').text(convertSeconds(response.currentTime));
+      popup.duration = response.duration;
+      $('#seek-bar-range').attr('max', response.duration);
+      $('#duration').text(convertSeconds(response.duration));
+      popup.slider.noUiSlider.updateOptions({
+        range: {
+          'min': 0,
+          'max': response.duration
         }
-        popup.volume = response.volume * 100;
-        $('#volume-range').val(response.volume * 100);
-        $("#volume-num").text(Math.floor(response.volume * 100));
-        popup.speed = response.speed * 100;
-        $('#speed-range').val(response.speed * 100);
-        $("#speed-num").text('x' + response.speed);
-        popup.pitch = response.pitch;
-        $('#pitch-range').val(response.pitch);
-        $("#pitch-num").text(response.pitch);
-        response.eqVals.forEach(function (val, idx) {
-          popup.eqVals[idx] = val;
-          $('#eq' + (idx + 1)).val(val);
-          $('#eq' + (idx + 1) + '-value').text(val + 'db');
-        });
+      });
+      popup.loop = response.loop;
+      $('#loop-switch').attr('checked', response.loop);
+      popup.loopStart = response.loopStart;
+      $("#loop-start-num").text(convertSeconds(response.loopStart));
+      popup.loopEnd = response.loopEnd;
+      $("#loop-end-num").text(convertSeconds(response.loopEnd));
+      popup.slider.noUiSlider.set([response.loopStart, response.loopEnd]);
+      popup.isPaused = response.isPaused;
+      if (response.isPaused) {
+        $('#play-btn-svg').css('display', 'inline');
+        $('#pause-btn-svg').css('display', 'none');
+      } else {
+        $('#play-btn-svg').css('display', 'none');
+        $('#pause-btn-svg').css('display', 'inline');
       }
+      popup.volume = response.volume * 100;
+      $('#volume-range').val(response.volume * 100);
+      $("#volume-num").text(Math.floor(response.volume * 100));
+      popup.speed = response.speed * 100;
+      $('#speed-range').val(response.speed * 100);
+      $("#speed-num").text('x' + response.speed);
+      popup.pitch = response.pitch;
+      $('#pitch-range').val(response.pitch);
+      $("#pitch-num").text(response.pitch);
+      response.eqVals.forEach(function (val, idx) {
+        popup.eqVals[idx] = val;
+        $('#eq' + (idx + 1)).val(val);
+        $('#eq' + (idx + 1) + '-value').text(val + 'db');
+      });
     });
   });
 
@@ -292,7 +289,7 @@
     function(request, sender, sendResponse) {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         if(tabs[0].id === request.tabId) {
-          if (request.type === 'every_seconds') {
+          if (request.type === 'timeupdate') {
             console.log(request);
             if (!popup.seeking) {
               $('#seek-bar-range').val(request.currentTime);
