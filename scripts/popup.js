@@ -3,16 +3,16 @@
 (function () {
   // constructor
   var Popup = function() {
-    var that = this;
     // fields
+    // flg
     this.seeking = false;
     this.isValid = false;
+    // props
     this.currentTime = 0;
-    this.currentTime = 0;
-    this.duration = 0;
+    this.duration = 1;
     this.loop = false;
     this.loopStart = 0;
-    this.loopEnd = 0;
+    this.loopEnd = 1;
     this.isPaused = true;
     this.volume = 50;
     this.speed = 100;
@@ -23,18 +23,15 @@
     });
     this.slider = document.getElementById('slider');
     noUiSlider.create(this.slider, {
-      start: [0, 100],
+      start: [this.loopStart, this.loopEnd],
       connect: true,
       behaviour: 'none',
       range: {
-        'min': 0,
-        'max': 100
+        'min': this.loopStart,
+        'max': this.loopEnd
       }
     });
   };
-  // methods
-  // Popup.prototype = {
-  // };
 
   // create instance
   var popup = new Popup();
@@ -42,47 +39,12 @@
   // send initialization message to content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {type: 'init', tabId: tabs[0].id}, function(response) {
-      popup.currentTime = response.currentTime;
-      $('#seek-bar-range').val(response.currentTime);
-      $('#current-time').text(convertSeconds(response.currentTime));
-      popup.duration = response.duration;
-      $('#seek-bar-range').attr('max', response.duration);
-      $('#duration').text(convertSeconds(response.duration));
-      popup.slider.noUiSlider.updateOptions({
-        range: {
-          'min': 0,
-          'max': response.duration
-        }
-      });
-      popup.loop = response.loop;
-      $('#loop-switch').attr('checked', response.loop);
-      popup.loopStart = response.loopStart;
-      $("#loop-start-num").text(convertSeconds(response.loopStart));
-      popup.loopEnd = response.loopEnd;
-      $("#loop-end-num").text(convertSeconds(response.loopEnd));
-      popup.slider.noUiSlider.set([response.loopStart, response.loopEnd]);
-      popup.isPaused = response.isPaused;
-      if (response.isPaused) {
-        $('#play-btn-svg').css('display', 'inline');
-        $('#pause-btn-svg').css('display', 'none');
+      if (response === undefined) {
+        popup.isValid = false;
       } else {
-        $('#play-btn-svg').css('display', 'none');
-        $('#pause-btn-svg').css('display', 'inline');
+        popup.isValid = true;
+        initPrams(popup, response);
       }
-      popup.volume = response.volume * 100;
-      $('#volume-range').val(response.volume * 100);
-      $("#volume-num").text(Math.floor(response.volume * 100));
-      popup.speed = response.speed * 100;
-      $('#speed-range').val(response.speed * 100);
-      $("#speed-num").text('x' + response.speed);
-      popup.pitch = response.pitch;
-      $('#pitch-range').val(response.pitch);
-      $("#pitch-num").text(response.pitch);
-      response.eqVals.forEach(function (val, idx) {
-        popup.eqVals[idx] = val;
-        $('#eq' + (idx + 1)).val(val);
-        $('#eq' + (idx + 1) + '-value').text(val + 'db');
-      });
     });
   });
 
@@ -268,16 +230,18 @@
   });
   popup.slider.noUiSlider.on('end', function(values, handle){
     if (handle === 0) {
+      popup.loopStart = Number(values[0]);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopStart', seconds: Number(values[0])});
       });
     } else if (handle === 1) {
+      popup.loopEnd = Number(values[1]);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopEnd', seconds: Number(values[1])});
       });
     }
   });
-  popup.slider.noUiSlider.on('update', function(values, handle){
+  popup.slider.noUiSlider.on('update', function(values, handle) {
     if (handle === 0) {
       $("#loop-start-num").text(convertSeconds(values[0]));
     } else if (handle === 1) {
@@ -285,48 +249,88 @@
     }
   });
 
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if(tabs[0].id === request.tabId) {
-          if (request.type === 'timeupdate') {
-            console.log(request);
-            if (!popup.seeking) {
-              $('#seek-bar-range').val(request.currentTime);
-              $('#current-time').text(convertSeconds(request.currentTime));
-              if (request.duration !== popup.duration) {
-                popup.duration = request.duration;
-                $('#seek-bar-range').attr('max', request.duration);
-                $('#duration').text(convertSeconds(request.duration));
-                popup.slider.noUiSlider.updateOptions({
-                  range: {
-                    'min': 0,
-                    'max': request.duration
-                  }
-                });
-                popup.slider.noUiSlider.set([0, request.duration]);
-                popup.loopStart = 0;
-                popup.loopStart = request.duration;
-                $('#loop-start-num').text(convertSeconds(0));
-                $('#loop-end-num').text(convertSeconds(request.duration));
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                  chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopStart', seconds: popup.loopStart});
-                });
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                  chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopEnd', seconds: popup.loopEnd});
-                });
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if(tabs[0].id === request.tabId) {
+        if (request.type === 'timeupdate') {
+          if (!popup.seeking) {
+            $('#seek-bar-range').val(request.currentTime);
+            $('#current-time').text(convertSeconds(request.currentTime));
+          }
+          if (request.duration !== popup.duration) {
+            popup.duration = request.duration;
+            $('#seek-bar-range').attr('max', request.duration);
+            $('#duration').text(convertSeconds(request.duration));
+            popup.slider.noUiSlider.updateOptions({
+              range: {
+                'min': 0,
+                'max': request.duration
               }
-            }
+            });
+            popup.slider.noUiSlider.set([0, request.duration]);
+            popup.loopStart = 0;
+            popup.loopStart = request.duration;
+            $('#loop-start-num').text(convertSeconds(0));
+            $('#loop-end-num').text(convertSeconds(request.duration));
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+              chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopStart', seconds: popup.loopStart});
+            });
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+              chrome.tabs.sendMessage(tabs[0].id, {type: 'setLoopEnd', seconds: popup.loopEnd});
+            });
           }
         }
-      });
-    }
-  );
+      }
+    });
+  });
 
 })();
 
-
 /* functions */
+
+function initPrams(popup, response) {
+  popup.currentTime = response.currentTime;
+  $('#seek-bar-range').val(response.currentTime);
+  $('#current-time').text(convertSeconds(response.currentTime));
+  popup.duration = response.duration;
+  $('#seek-bar-range').attr('max', response.duration);
+  $('#duration').text(convertSeconds(response.duration));
+  popup.slider.noUiSlider.updateOptions({
+    range: {
+      'min': 0,
+      'max': response.duration
+    }
+  });
+  popup.loop = response.loop;
+  $('#loop-switch').attr('checked', response.loop);
+  popup.loopStart = response.loopStart;
+  $("#loop-start-num").text(convertSeconds(response.loopStart));
+  popup.loopEnd = response.loopEnd;
+  $("#loop-end-num").text(convertSeconds(response.loopEnd));
+  popup.slider.noUiSlider.set([response.loopStart, response.loopEnd]);
+  popup.isPaused = response.isPaused;
+  if (response.isPaused) {
+    $('#play-btn-svg').css('display', 'inline');
+    $('#pause-btn-svg').css('display', 'none');
+  } else {
+    $('#play-btn-svg').css('display', 'none');
+    $('#pause-btn-svg').css('display', 'inline');
+  }
+  popup.volume = response.volume * 100;
+  $('#volume-range').val(response.volume * 100);
+  $("#volume-num").text(Math.floor(response.volume * 100));
+  popup.speed = response.speed * 100;
+  $('#speed-range').val(response.speed * 100);
+  $("#speed-num").text('x' + response.speed);
+  popup.pitch = response.pitch;
+  $('#pitch-range').val(response.pitch);
+  $("#pitch-num").text(response.pitch);
+  response.eqVals.forEach(function (val, idx) {
+    popup.eqVals[idx] = val;
+    $('#eq' + (idx + 1)).val(val);
+    $('#eq' + (idx + 1) + '-value').text(val + 'db');
+  });
+}
 
 function convertSeconds(rawSeconds) {
   var minutes = Math.floor(rawSeconds / 60);
