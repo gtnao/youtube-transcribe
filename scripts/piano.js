@@ -5,7 +5,7 @@ $(function() {
 
   var pianoAudioCtx = new AudioContext();
   var gainNode = pianoAudioCtx.createGain();
-  var gain = 0.25;
+  var gain = 0.1;
   var octave = 4;
   var pressingNodeNum = null;
   var oscs = {};
