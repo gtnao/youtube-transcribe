@@ -10,6 +10,7 @@
     this.loop = false;
     this.loopStart = 0;
     this.loopEnd = 1;
+    this.vocalCancel = false;
     this.isPaused = true;
     this.volume = 50;
     this.speed = 100;
@@ -55,6 +56,21 @@
       $('#loop-switch').attr('checked', true);
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'enableLoop', isEnabled: true});
+      });
+    }
+  });
+  $('#vocal-slider').on('click', function() {
+    if(popup.vocalCancel) {
+      popup.vocalCancel  = false;
+      $('#vocal-switch').attr('checked', false);
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'setVocalCancel', isEnabled: false});
+      });
+    } else {
+      popup.vocalCancel  = true;
+      $('#vocal-switch').attr('checked', true);
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'setVocalCancel', isEnabled: true});
       });
     }
   });
@@ -297,6 +313,8 @@ function initPrams(popup, response) {
   });
   popup.loop = response.loop;
   $('#loop-switch').attr('checked', response.loop);
+  popup.vocalCancel = response.vocalCancel;
+  $('#vocal-switch').attr('checked', response.vocalCancel);
   popup.loopStart = response.loopStart;
   $("#loop-start-num").text(convertSeconds(response.loopStart));
   popup.loopEnd = response.loopEnd;

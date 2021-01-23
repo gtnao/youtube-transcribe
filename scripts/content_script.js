@@ -16,11 +16,22 @@
     this.pitchChangeMode= this.audioCtx.createGain();
     this.jungle = new Jungle(this.audioCtx);
     this.output = this.audioCtx.createGain();
+    // For Vocal Canceller
+    this.nonVocalCancelMode = this.audioCtx.createGain();
+    this.vocalCancelMode= this.audioCtx.createGain();
+    this.dest = this.audioCtx.createGain();
+    this.splitter = this.audioCtx.createChannelSplitter(2);
+    this.merger = this.audioCtx.createChannelMerger(2);
+    this.postMerger = this.audioCtx.createChannelMerger(2);
+    this.gainNodeL = this.audioCtx.createGain();
+    this.gainNodeR = this.audioCtx.createGain();
+    this.reverseGainNode = this.audioCtx.createGain();
     // parameter
     this.loop = false;
     this.loopStart = 0;
     this.loopEnd = 1;
     this.pitch = 0;
+    this.vocalCancel = false;
     // other
     this.alreadyLoaded = false;
     this.hasVideo = false;
@@ -30,6 +41,12 @@
     // default settings
     this.input.gain.value = 1;
     this.output.gain.value = 1;
+    this.reverseGainNode.gain.value = -1;
+    this.dest.gain.value = 1;
+    this.gainNodeL.gain.value = 1;
+    this.gainNodeR.gain.value = 1;
+    this.vocalCancelMode.gain.value = 0;
+    this.nonVocalCancelMode.gain.value = 1;
     this.jungle.setPitchOffset(0, false);
     this.pitchChangeMode.gain.value = 0;
     this.nonPitchChangeMode.gain.value = 1;
@@ -79,6 +96,16 @@
     setLoopEnd: function(seconds) {
       this.loopEnd = seconds;
     },
+    setVocalCancel: function(isEnabled) {
+      this.vocalCancel = isEnabled;
+      if(this.vocalCancel === true){
+        this.vocalCancelMode.gain.value = 1;
+        this.nonVocalCancelMode.gain.value = 0;
+      }else{
+        this.vocalCancelMode.gain.value = 0;
+        this.nonVocalCancelMode.gain.value = 1;
+      }
+    },
     changeEq: function(zoneIdx, gain) {
       this.peakings[zoneIdx].gain.value = gain;
     },
@@ -106,7 +133,24 @@ function connectNode(that) {
   that.pitchChangeMode.connect(that.jungle.input);
   that.nonPitchChangeMode.connect(that.output);
   that.jungle.output.connect(that.output);
-  that.output.connect(that.audioCtx.destination);
+  that.output.connect(that.vocalCancelMode);
+  that.output.connect(that.nonVocalCancelMode);
+  // start vocal cancel mode
+  that.vocalCancelMode.connect(that.splitter);
+  // phase inverse
+  that.splitter.connect(that.reverseGainNode, 0);
+  // merge into monoral (off vocal)
+  that.reverseGainNode.connect(that.merger, 0, 0);
+  that.output.connect(that.merger);
+  // duplicate monoral audio
+  that.merger.connect(that.gainNodeL);
+  that.merger.connect(that.gainNodeR);
+  that.gainNodeL.connect(that.postMerger, 0, 0);
+  that.gainNodeR.connect(that.postMerger, 0, 1);
+  that.postMerger.connect(that.dest); 
+  that.dest.connect(that.audioCtx.destination); 
+  // start non vocal cancel mode
+  that.nonVocalCancelMode.connect(that.audioCtx.destination);
 }
 function eqSet(that) {
   var frequency = 31.25;
@@ -166,6 +210,7 @@ function assignEvent(that) {
           loop: that.loop,
           loopStart: that.loopStart,
           loopEnd: that.loopEnd,
+          vocalCancel: that.vocalCancel,
           isPaused: that.videoEl.paused,
           volume: that.videoEl.volume,
           speed: that.videoEl.playbackRate,
@@ -249,6 +294,11 @@ function assignEvent(that) {
       case 'setLoopEnd': {
         if (!that.hasVideo) {break;}
         that.setLoopEnd(message.seconds);
+        break;
+      }
+      case 'setVocalCancel': {
+        if (!that.hasVideo) {break;}
+        that.setVocalCancel(message.isEnabled);
         break;
       }
       case 'changeEq': {
